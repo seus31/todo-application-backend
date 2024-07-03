@@ -8,6 +8,7 @@ RUN go mod download
 COPY . .
 
 RUN go install github.com/air-verse/air@latest
+RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 
 EXPOSE 8080
 
