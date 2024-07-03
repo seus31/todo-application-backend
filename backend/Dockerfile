@@ -1,4 +1,4 @@
-FROM golang:1.21-alpine
+FROM golang:1.22-alpine
 
 WORKDIR /app
 
@@ -7,8 +7,9 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o main .
+RUN go install github.com/air-verse/air@latest
+RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 
 EXPOSE 8080
 
-CMD ["./main"]
+CMD ["air"]
