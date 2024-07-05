@@ -2,17 +2,25 @@ package main
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/seus31/todo-application/backend/routes"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 func main() {
 	app := fiber.New()
 
-	app.Use(cors.New())
+	dsn := "host=db user=myuser password=mypassword dbname=mydb port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
-	app.Get("/api/hello", func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{"message": "Hello from Go/Fiber!"})
-	})
+	if err != nil {
+		panic("データベース接続に失敗しました")
+	}
+
+	api := app.Group("/api")
+	v1 := api.Group("/v1")
+
+	routes.SetUpTaskRoutes(v1, db)
 
 	app.Listen(":8080")
 }
