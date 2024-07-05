@@ -18,8 +18,26 @@ func NewUTaskController(taskService *services.TaskService) *TaskController {
 	}
 }
 
+func (tc *TaskController) GetTasks(ctx *fiber.Ctx) error {
+	req := new(dto.GetTasksRequest)
+	if err := ctx.BodyParser(req); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid query parameters"})
+	}
+
+	if err := utils.ValidateStruct(req); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	offset := (req.Page - 1) * req.Limit
+	tasks, err := tc.TaskService.GetTasks(utils.GetContextFromFiber(ctx), req.Limit, offset)
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to fetch users"})
+	}
+
+	return ctx.JSON(tasks)
+}
+
 func (tc *TaskController) CreateTask(ctx *fiber.Ctx) error {
-	var context = utils.GetContextFromFiber(ctx)
 	var req dto.CreateTaskRequest
 	if err := ctx.BodyParser(&req); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Request parsing failed"})
@@ -33,7 +51,7 @@ func (tc *TaskController) CreateTask(ctx *fiber.Ctx) error {
 		TaskName: req.TaskName,
 	}
 
-	if err := tc.TaskService.CreateTask(context, task); err != nil {
+	if err := tc.TaskService.CreateTask(utils.GetContextFromFiber(ctx), task); err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to create task"})
 	}
 
