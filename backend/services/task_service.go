@@ -27,3 +27,7 @@ func (s *TaskService) CreateTask(ctx context.Context, task *models.Task) error {
 
 	return s.taskRepo.Create(ctx, task)
 }
+
+func (s *TaskService) GetTask(ctx context.Context, id uint) (*models.Task, error) {
+	return s.taskRepo.GetTaskByID(ctx, id)
+}

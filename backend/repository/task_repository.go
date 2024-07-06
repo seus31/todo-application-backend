@@ -26,3 +26,11 @@ func (r *TaskRepository) GetTasks(ctx context.Context, limit int, offset int) ([
 func (r *TaskRepository) Create(ctx context.Context, task *models.Task) error {
 	return r.db.WithContext(ctx).Create(task).Error
 }
+
+func (r *TaskRepository) GetTaskByID(ctx context.Context, id uint) (*models.Task, error) {
+	var task models.Task
+	if err := r.db.WithContext(ctx).First(&task, id).Error; err != nil {
+		return nil, err
+	}
+	return &task, nil
+}
