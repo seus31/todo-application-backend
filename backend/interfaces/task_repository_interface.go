@@ -8,4 +8,5 @@ import (
 type TaskRepositoryInterface interface {
 	GetTasks(ctx context.Context, limit int, offset int) ([]*models.Task, error)
 	Create(ctx context.Context, task *models.Task) error
+	GetTaskByID(ctx context.Context, id uint) (*models.Task, error)
 }
