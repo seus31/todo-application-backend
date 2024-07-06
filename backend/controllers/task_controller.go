@@ -2,10 +2,13 @@ package controllers
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/seus31/todo-application/backend/dto"
+	"github.com/seus31/todo-application/backend/dto/requests"
+	"github.com/seus31/todo-application/backend/dto/responses"
 	"github.com/seus31/todo-application/backend/models"
 	"github.com/seus31/todo-application/backend/services"
 	"github.com/seus31/todo-application/backend/utils"
+	"log"
+	"time"
 )
 
 type TaskController struct {
@@ -19,7 +22,7 @@ func NewUTaskController(taskService *services.TaskService) *TaskController {
 }
 
 func (tc *TaskController) GetTasks(ctx *fiber.Ctx) error {
-	req := new(dto.GetTasksRequest)
+	req := new(requests.GetTasksRequest)
 	if err := ctx.BodyParser(req); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid query parameters"})
 	}
@@ -38,7 +41,7 @@ func (tc *TaskController) GetTasks(ctx *fiber.Ctx) error {
 }
 
 func (tc *TaskController) CreateTask(ctx *fiber.Ctx) error {
-	var req dto.CreateTaskRequest
+	var req requests.CreateTaskRequest
 	if err := ctx.BodyParser(&req); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Request parsing failed"})
 	}
@@ -56,4 +59,29 @@ func (tc *TaskController) CreateTask(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.Status(fiber.StatusCreated).JSON(task)
+}
+
+func (tc *TaskController) GetTask(ctx *fiber.Ctx) error {
+	var req requests.GetTaskRequest
+	if err := ctx.ParamsParser(&req); err != nil {
+		log.Print(err)
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid task ID"})
+	}
+
+	if err := utils.ValidateStruct(req); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	task, err := tc.TaskService.GetTask(utils.GetContextFromFiber(ctx), req.ID)
+	if err != nil {
+		return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Task not found"})
+	}
+
+	response := responses.TaskResponse{
+		ID:        task.ID,
+		TaskName:  task.TaskName,
+		CreatedAt: task.CreatedAt.Format(time.RFC3339),
+	}
+
+	return ctx.JSON(response)
 }
