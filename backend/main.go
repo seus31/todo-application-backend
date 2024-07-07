@@ -23,5 +23,8 @@ func main() {
 
 	routes.SetUpTaskRoutes(tasks, db)
 
-	app.Listen(":8080")
+	err := app.Listen(":8080")
+	if err != nil {
+		return
+	}
 }
