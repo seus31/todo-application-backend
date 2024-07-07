@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"github.com/seus31/todo-application/backend/dto/requests"
 	"github.com/seus31/todo-application/backend/interfaces"
 	"github.com/seus31/todo-application/backend/models"
 )
@@ -21,13 +22,21 @@ func (s *TaskService) GetTasks(ctx context.Context, limit int, offset int) ([]*m
 }
 
 func (s *TaskService) CreateTask(ctx context.Context, task *models.Task) error {
-	if err := task.Validate(); err != nil {
-		return err
-	}
-
 	return s.taskRepo.Create(ctx, task)
 }
 
 func (s *TaskService) GetTask(ctx context.Context, id uint) (*models.Task, error) {
 	return s.taskRepo.GetTaskByID(ctx, id)
+}
+
+func (s *TaskService) UpdateTask(ctx context.Context, task *models.Task, req requests.UpdateTaskRequest) (*models.Task, error) {
+	task.TaskName = req.TaskName
+	err := s.taskRepo.Update(ctx, task)
+	if err != nil {
+		return nil, err
+	}
+
+	updateTask, err := s.taskRepo.GetTaskByID(ctx, task.ID)
+
+	return updateTask, err
 }
