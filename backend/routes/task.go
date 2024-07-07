@@ -16,4 +16,5 @@ func SetUpTaskRoutes(router fiber.Router, db *gorm.DB) {
 	router.Get("/tasks", taskController.GetTasks)
 	router.Post("/tasks", taskController.CreateTask)
 	router.Get("/tasks/:id", taskController.GetTask)
+	router.Put("/tasks/:id", taskController.UpdateTask)
 }
