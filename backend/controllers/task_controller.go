@@ -8,6 +8,7 @@ import (
 	"github.com/seus31/todo-application/backend/services"
 	"github.com/seus31/todo-application/backend/utils"
 	"log"
+	"strconv"
 	"time"
 )
 
@@ -84,4 +85,39 @@ func (tc *TaskController) GetTask(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.JSON(response)
+}
+
+func (tc *TaskController) UpdateTask(ctx *fiber.Ctx) error {
+	var req requests.UpdateTaskRequest
+	taskId, err := strconv.Atoi(ctx.Params("id"))
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid task ID"})
+	}
+
+	if err := ctx.BodyParser(&req); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Cannot parse JSON"})
+	}
+
+	if err := utils.ValidateStruct(req); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	task, err := tc.TaskService.GetTask(utils.GetContextFromFiber(ctx), uint(taskId))
+	if err != nil {
+		return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Task not found"})
+	}
+
+	updatedTask, err := tc.TaskService.UpdateTask(utils.GetContextFromFiber(ctx), task, req)
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Cannot update task"})
+	}
+
+	response := responses.TaskResponse{
+		ID:        updatedTask.ID,
+		TaskName:  updatedTask.TaskName,
+		CreatedAt: updatedTask.CreatedAt.Format(time.RFC3339),
+		UpdatedAt: updatedTask.UpdatedAt.Format(time.RFC3339),
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(response)
 }
