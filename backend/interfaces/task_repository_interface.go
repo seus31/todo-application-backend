@@ -10,5 +10,4 @@ type TaskRepositoryInterface interface {
 	Create(ctx context.Context, task *models.Task) error
 	GetTaskByID(ctx context.Context, id uint) (*models.Task, error)
 	Update(ctx context.Context, task *models.Task) error
-	Delete(ctx context.Context, task *models.Task) error
 }

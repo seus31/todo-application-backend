@@ -40,7 +40,3 @@ func (s *TaskService) UpdateTask(ctx context.Context, task *models.Task, req req
 
 	return updateTask, err
 }
-
-func (s *TaskService) DeleteTask(ctx context.Context, task *models.Task) error {
-	return s.taskRepo.Delete(ctx, task)
-}
