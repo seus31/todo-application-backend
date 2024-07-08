@@ -121,3 +121,21 @@ func (tc *TaskController) UpdateTask(ctx *fiber.Ctx) error {
 
 	return ctx.Status(fiber.StatusOK).JSON(response)
 }
+
+func (tc *TaskController) DeleteTask(ctx *fiber.Ctx) error {
+	taskId, err := strconv.Atoi(ctx.Params("id"))
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid task ID"})
+	}
+
+	task, err := tc.TaskService.GetTask(utils.GetContextFromFiber(ctx), uint(taskId))
+	if err != nil {
+		return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Task not found"})
+	}
+
+	if err := tc.TaskService.DeleteTask(utils.GetContextFromFiber(ctx), task); err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Cannot delete task"})
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
+}
