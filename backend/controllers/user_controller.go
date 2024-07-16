@@ -45,3 +45,22 @@ func (uc *UserController) CreateUser(ctx *fiber.Ctx) error {
 
 	return ctx.Status(fiber.StatusCreated).JSON(user)
 }
+
+func (uc *UserController) GetUsers(ctx *fiber.Ctx) error {
+	var req requests.GetUsersRequest
+	if err := ctx.BodyParser(&req); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid parameters"})
+	}
+
+	if err := utils.ValidateStruct(&req); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"errors": err.Error()})
+	}
+
+	offset := (req.Page - 1) * req.Limit
+	users, err := uc.UserService.GetUsers(utils.GetContextFromFiber(ctx), req.Limit, offset)
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to get users"})
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(users)
+}
