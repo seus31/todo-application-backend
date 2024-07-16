@@ -16,6 +16,10 @@ func NewUserService(repo interfaces.UserRepositoryInterface) *UserService {
 	}
 }
 
+func (s *UserService) GetUsers(ctx context.Context, offset int, limit int) ([]*models.User, error) {
+	return s.userRepo.GetUsers(ctx, offset, limit)
+}
+
 func (s *UserService) CreateUser(ctx context.Context, user *models.User) error {
 
 	return s.userRepo.Create(ctx, user)
