@@ -12,5 +12,6 @@ func SetUpUserRoutes(router fiber.Router, db *gorm.DB) {
 	var userRepository = repository.NewUserRepository(db)
 	userService := services.NewUserService(userRepository)
 	userController := controllers.NewUserController(userService)
+	router.Get("/", userController.GetUsers)
 	router.Post("/", userController.CreateUser)
 }
