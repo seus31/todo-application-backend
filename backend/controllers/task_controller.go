@@ -23,12 +23,12 @@ func NewUTaskController(taskService *services.TaskService) *TaskController {
 }
 
 func (tc *TaskController) GetTasks(ctx *fiber.Ctx) error {
-	req := new(requests.GetTasksRequest)
-	if err := ctx.BodyParser(req); err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid query parameters"})
+	var req requests.GetTasksRequest
+	if err := ctx.BodyParser(&req); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid parameters"})
 	}
 
-	if err := utils.ValidateStruct(req); err != nil {
+	if err := utils.ValidateStruct(&req); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
