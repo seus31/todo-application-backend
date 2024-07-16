@@ -20,8 +20,10 @@ func main() {
 	api := app.Group("/api")
 	v1 := api.Group("/v1")
 	tasks := v1.Group("/tasks")
+	users := v1.Group("/users")
 
 	routes.SetUpTaskRoutes(tasks, db)
+	routes.SetUpUserRoutes(users, db)
 
 	err = app.Listen(":8080")
 	if err != nil {
