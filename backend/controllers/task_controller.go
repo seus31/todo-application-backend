@@ -84,7 +84,7 @@ func (tc *TaskController) GetTask(ctx *fiber.Ctx) error {
 		CreatedAt: task.CreatedAt.Format(time.RFC3339),
 	}
 
-	return ctx.JSON(response)
+	return ctx.Status(fiber.StatusOK).JSON(response)
 }
 
 func (tc *TaskController) UpdateTask(ctx *fiber.Ctx) error {
