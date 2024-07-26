@@ -24,3 +24,7 @@ func (s *UserService) CreateUser(ctx context.Context, user *models.User) error {
 
 	return s.userRepo.Create(ctx, user)
 }
+
+func (s *UserService) GetUser(ctx context.Context, id uint) (*models.User, error) {
+	return s.userRepo.GetUserById(ctx, id)
+}
