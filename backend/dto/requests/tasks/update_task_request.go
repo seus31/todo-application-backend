@@ -1,5 +1,5 @@
-package requests
+package tasks
 
-type CreateTaskRequest struct {
+type UpdateTaskRequest struct {
 	TaskName string `json:"task_name" validate:"required,max=255"`
 }

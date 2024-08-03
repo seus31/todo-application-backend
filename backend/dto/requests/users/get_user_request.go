@@ -1,5 +1,5 @@
-package requests
+package users
 
-type GetTaskRequest struct {
+type GetUserRequest struct {
 	ID uint `params:"id" validate:"required,min=1"`
 }

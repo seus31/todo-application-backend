@@ -1,4 +1,4 @@
-package requests
+package users
 
 type GetUsersRequest struct {
 	Limit int `query:"limit" validate:"required,min=1,max=100"`

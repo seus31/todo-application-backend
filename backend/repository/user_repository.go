@@ -27,10 +27,14 @@ func (r *UserRepository) Create(ctx context.Context, user *models.User) error {
 	return r.db.WithContext(ctx).Create(user).Error
 }
 
-func (r *UserRepository) GetUserById(ctx context.Context, id uint) (*models.User, error) {
+func (r *UserRepository) GetUserByID(ctx context.Context, id uint) (*models.User, error) {
 	var user models.User
 	if err := r.db.WithContext(ctx).First(&user, id).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil
+}
+
+func (r *UserRepository) Update(ctx context.Context, user *models.User) error {
+	return r.db.WithContext(ctx).Model(user).Updates(user).Error
 }

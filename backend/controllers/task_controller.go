@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/seus31/todo-application/backend/dto/requests"
+	"github.com/seus31/todo-application/backend/dto/requests/tasks"
 	"github.com/seus31/todo-application/backend/dto/responses"
 	"github.com/seus31/todo-application/backend/models"
 	"github.com/seus31/todo-application/backend/services"
@@ -23,7 +23,7 @@ func NewUTaskController(taskService *services.TaskService) *TaskController {
 }
 
 func (tc *TaskController) GetTasks(ctx *fiber.Ctx) error {
-	var req requests.GetTasksRequest
+	var req tasks.GetTasksRequest
 	if err := ctx.BodyParser(&req); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid parameters"})
 	}
@@ -42,7 +42,7 @@ func (tc *TaskController) GetTasks(ctx *fiber.Ctx) error {
 }
 
 func (tc *TaskController) CreateTask(ctx *fiber.Ctx) error {
-	var req requests.CreateTaskRequest
+	var req tasks.CreateTaskRequest
 	if err := ctx.BodyParser(&req); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Request parsing failed"})
 	}
@@ -63,7 +63,7 @@ func (tc *TaskController) CreateTask(ctx *fiber.Ctx) error {
 }
 
 func (tc *TaskController) GetTask(ctx *fiber.Ctx) error {
-	var req requests.GetTaskRequest
+	var req tasks.GetTaskRequest
 	if err := ctx.ParamsParser(&req); err != nil {
 		log.Print(err)
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid task ID"})
@@ -88,7 +88,7 @@ func (tc *TaskController) GetTask(ctx *fiber.Ctx) error {
 }
 
 func (tc *TaskController) UpdateTask(ctx *fiber.Ctx) error {
-	var req requests.UpdateTaskRequest
+	var req tasks.UpdateTaskRequest
 	taskId, err := strconv.Atoi(ctx.Params("id"))
 	if err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid task ID"})

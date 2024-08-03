@@ -2,7 +2,7 @@ package services
 
 import (
 	"context"
-	"github.com/seus31/todo-application/backend/dto/requests"
+	"github.com/seus31/todo-application/backend/dto/requests/tasks"
 	"github.com/seus31/todo-application/backend/interfaces"
 	"github.com/seus31/todo-application/backend/models"
 )
@@ -29,7 +29,7 @@ func (s *TaskService) GetTask(ctx context.Context, id uint) (*models.Task, error
 	return s.taskRepo.GetTaskByID(ctx, id)
 }
 
-func (s *TaskService) UpdateTask(ctx context.Context, task *models.Task, req requests.UpdateTaskRequest) (*models.Task, error) {
+func (s *TaskService) UpdateTask(ctx context.Context, task *models.Task, req tasks.UpdateTaskRequest) (*models.Task, error) {
 	task.TaskName = req.TaskName
 	err := s.taskRepo.Update(ctx, task)
 	if err != nil {

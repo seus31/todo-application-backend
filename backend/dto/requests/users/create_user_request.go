@@ -1,4 +1,4 @@
-package requests
+package users
 
 type CreateUserRequest struct {
 	Name     string `json:"name" validate:"required,max=255"`
