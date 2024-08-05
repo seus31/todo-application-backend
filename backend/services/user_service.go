@@ -39,3 +39,7 @@ func (s *UserService) UpdateUser(ctx context.Context, user *models.User) (*model
 
 	return updateUser, err
 }
+
+func (s *UserService) DeleteUser(ctx context.Context, user *models.User) error {
+	return s.userRepo.Delete(ctx, user)
+}
