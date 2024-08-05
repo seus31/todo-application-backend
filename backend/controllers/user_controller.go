@@ -142,3 +142,21 @@ func (uc *UserController) UpdateUser(ctx *fiber.Ctx) error {
 
 	return ctx.Status(fiber.StatusOK).JSON(response)
 }
+
+func (uc *UserController) DeleteUser(ctx *fiber.Ctx) error {
+	userId, err := strconv.Atoi(ctx.Params("id"))
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid user ID"})
+	}
+
+	user, err := uc.UserService.GetUser(utils.GetContextFromFiber(ctx), uint(userId))
+	if err != nil {
+		return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "User not found"})
+	}
+
+	if err := uc.UserService.DeleteUser(utils.GetContextFromFiber(ctx), user); err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Cannot delete user"})
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
+}
