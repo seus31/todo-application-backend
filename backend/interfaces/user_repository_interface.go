@@ -10,4 +10,5 @@ type UserRepositoryInterface interface {
 	Create(ctx context.Context, user *models.User) error
 	GetUserByID(ctx context.Context, id uint) (*models.User, error)
 	Update(ctx context.Context, user *models.User) error
+	Delete(ctx context.Context, user *models.User) error
 }

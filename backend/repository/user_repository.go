@@ -38,3 +38,7 @@ func (r *UserRepository) GetUserByID(ctx context.Context, id uint) (*models.User
 func (r *UserRepository) Update(ctx context.Context, user *models.User) error {
 	return r.db.WithContext(ctx).Model(user).Updates(user).Error
 }
+
+func (r *UserRepository) Delete(ctx context.Context, user *models.User) error {
+	return r.db.WithContext(ctx).Delete(&user, user.ID).Error
+}
