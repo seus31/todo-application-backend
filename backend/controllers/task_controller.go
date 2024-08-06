@@ -16,7 +16,7 @@ type TaskController struct {
 	TaskService *services.TaskService
 }
 
-func NewUTaskController(taskService *services.TaskService) *TaskController {
+func NewTaskController(taskService *services.TaskService) *TaskController {
 	return &TaskController{
 		TaskService: taskService,
 	}
