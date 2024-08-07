@@ -60,12 +60,12 @@ func (uc *UserController) GetUsers(ctx *fiber.Ctx) error {
 	}
 
 	offset := (req.Page - 1) * req.Limit
-	users, err := uc.UserService.GetUsers(utils.GetContextFromFiber(ctx), req.Limit, offset)
+	usersData, err := uc.UserService.GetUsers(utils.GetContextFromFiber(ctx), req.Limit, offset)
 	if err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to get users"})
 	}
 
-	return ctx.Status(fiber.StatusOK).JSON(users)
+	return ctx.Status(fiber.StatusOK).JSON(usersData)
 }
 
 func (uc *UserController) GetUser(ctx *fiber.Ctx) error {

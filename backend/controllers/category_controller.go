@@ -46,3 +46,22 @@ func (cc *CategoryController) CreateCategory(ctx *fiber.Ctx) error {
 
 	return ctx.Status(fiber.StatusCreated).JSON(response)
 }
+
+func (cc *CategoryController) GetCategories(ctx *fiber.Ctx) error {
+	var req categories.GetCategoriesRequest
+	if err := ctx.BodyParser(&req); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid parameters"})
+	}
+
+	if err := utils.ValidateStruct(&req); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	offset := (req.Page - 1) * req.Limit
+	categoriesData, err := cc.CategoryService.GetCategories(utils.GetContextFromFiber(ctx), req.Limit, offset)
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to fetch categories"})
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(categoriesData)
+}

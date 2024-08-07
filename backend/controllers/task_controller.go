@@ -33,12 +33,12 @@ func (tc *TaskController) GetTasks(ctx *fiber.Ctx) error {
 	}
 
 	offset := (req.Page - 1) * req.Limit
-	tasks, err := tc.TaskService.GetTasks(utils.GetContextFromFiber(ctx), req.Limit, offset)
+	tasksData, err := tc.TaskService.GetTasks(utils.GetContextFromFiber(ctx), req.Limit, offset)
 	if err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to fetch users"})
 	}
 
-	return ctx.JSON(tasks)
+	return ctx.JSON(tasksData)
 }
 
 func (tc *TaskController) CreateTask(ctx *fiber.Ctx) error {
