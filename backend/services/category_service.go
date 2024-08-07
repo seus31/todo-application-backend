@@ -19,3 +19,7 @@ func NewCategoryService(repo interfaces.CategoryRepositoryInterface) *CategorySe
 func (s *CategoryService) CreateCategory(ctx context.Context, category *models.Category) error {
 	return s.categoryRepo.Create(ctx, category)
 }
+
+func (s *CategoryService) GetCategories(ctx context.Context, limit int, offset int) ([]*models.Category, error) {
+	return s.categoryRepo.GetCategories(ctx, limit, offset)
+}
