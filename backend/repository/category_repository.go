@@ -18,3 +18,11 @@ func NewCategoryRepository(db *gorm.DB) interfaces.CategoryRepositoryInterface {
 func (r *CategoryRepository) Create(ctx context.Context, category *models.Category) error {
 	return r.db.WithContext(ctx).Create(category).Error
 }
+
+func (r *CategoryRepository) GetCategories(ctx context.Context, limit int, offset int) ([]*models.Category, error) {
+	var categories []*models.Category
+	if err := r.db.WithContext(ctx).Limit(limit).Offset(offset).Find(&categories).Error; err != nil {
+		return nil, err
+	}
+	return categories, nil
+}
