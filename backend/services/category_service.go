@@ -23,3 +23,7 @@ func (s *CategoryService) CreateCategory(ctx context.Context, category *models.C
 func (s *CategoryService) GetCategories(ctx context.Context, limit int, offset int) ([]*models.Category, error) {
 	return s.categoryRepo.GetCategories(ctx, limit, offset)
 }
+
+func (s *CategoryService) GetCategory(ctx context.Context, id uint) (*models.Category, error) {
+	return s.categoryRepo.GetCategoryByID(ctx, id)
+}
