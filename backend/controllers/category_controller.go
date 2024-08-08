@@ -7,6 +7,7 @@ import (
 	"github.com/seus31/todo-application/backend/models"
 	"github.com/seus31/todo-application/backend/services"
 	"github.com/seus31/todo-application/backend/utils"
+	"log"
 	"time"
 )
 
@@ -64,4 +65,29 @@ func (cc *CategoryController) GetCategories(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(categoriesData)
+}
+
+func (cc *CategoryController) GetCategory(ctx *fiber.Ctx) error {
+	var req categories.GetCategoryRequest
+	if err := ctx.ParamsParser(&req); err != nil {
+		log.Print(err)
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid category ID"})
+	}
+
+	if err := utils.ValidateStruct(req); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	category, err := cc.CategoryService.GetCategory(utils.GetContextFromFiber(ctx), req.ID)
+	if err != nil {
+		return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Category not found"})
+	}
+
+	response := responses.CategoryResponse{
+		ID:           category.ID,
+		CategoryName: category.CategoryName,
+		CreatedAt:    category.CreatedAt.Format(time.RFC3339),
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(response)
 }
