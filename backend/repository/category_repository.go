@@ -26,3 +26,11 @@ func (r *CategoryRepository) GetCategories(ctx context.Context, limit int, offse
 	}
 	return categories, nil
 }
+
+func (r *CategoryRepository) GetCategoryByID(ctx context.Context, id uint) (*models.Category, error) {
+	var category models.Category
+	if err := r.db.WithContext(ctx).First(&category, id).Error; err != nil {
+		return nil, err
+	}
+	return &category, nil
+}
