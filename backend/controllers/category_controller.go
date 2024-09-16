@@ -8,6 +8,7 @@ import (
 	"github.com/seus31/todo-application/backend/services"
 	"github.com/seus31/todo-application/backend/utils"
 	"log"
+	"strconv"
 	"time"
 )
 
@@ -87,6 +88,41 @@ func (cc *CategoryController) GetCategory(ctx *fiber.Ctx) error {
 		ID:           category.ID,
 		CategoryName: category.CategoryName,
 		CreatedAt:    category.CreatedAt.Format(time.RFC3339),
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(response)
+}
+
+func (cc *CategoryController) UpdateCategory(ctx *fiber.Ctx) error {
+	var req categories.UpdateCategoryRequest
+	categoryId, err := strconv.Atoi(ctx.Params("id"))
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid category ID"})
+	}
+
+	if err := ctx.BodyParser(&req); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Cannot parse JSON"})
+	}
+
+	if err := utils.ValidateStruct(req); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	category, err := cc.CategoryService.GetCategory(utils.GetContextFromFiber(ctx), uint(categoryId))
+	if err != nil {
+		return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Category not found"})
+	}
+
+	updatedCategory, err := cc.CategoryService.UpdateCategory(utils.GetContextFromFiber(ctx), category, req)
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Cannot update category"})
+	}
+
+	response := responses.CategoryResponse{
+		ID:           updatedCategory.ID,
+		CategoryName: updatedCategory.CategoryName,
+		CreatedAt:    updatedCategory.CreatedAt.Format(time.RFC3339),
+		UpdatedAt:    updatedCategory.UpdatedAt.Format(time.RFC3339),
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(response)
