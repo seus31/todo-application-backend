@@ -15,4 +15,5 @@ func SetUpCategoryRoutes(router fiber.Router, db *gorm.DB) {
 	router.Post("/", categoryController.CreateCategory)
 	router.Get("/", categoryController.GetCategories)
 	router.Get("/:id", categoryController.GetCategory)
+	router.Put("/:id", categoryController.UpdateCategory)
 }
