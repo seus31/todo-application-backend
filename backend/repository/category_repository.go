@@ -34,3 +34,7 @@ func (r *CategoryRepository) GetCategoryByID(ctx context.Context, id uint) (*mod
 	}
 	return &category, nil
 }
+
+func (r *CategoryRepository) Update(ctx context.Context, category *models.Category) error {
+	return r.db.WithContext(ctx).Model(category).Updates(category).Error
+}
