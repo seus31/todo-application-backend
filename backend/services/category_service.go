@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"github.com/seus31/todo-application/backend/dto/requests/categories"
 	"github.com/seus31/todo-application/backend/interfaces"
 	"github.com/seus31/todo-application/backend/models"
 )
@@ -26,4 +27,16 @@ func (s *CategoryService) GetCategories(ctx context.Context, limit int, offset i
 
 func (s *CategoryService) GetCategory(ctx context.Context, id uint) (*models.Category, error) {
 	return s.categoryRepo.GetCategoryByID(ctx, id)
+}
+
+func (s *CategoryService) UpdateCategory(ctx context.Context, category *models.Category, req categories.UpdateCategoryRequest) (*models.Category, error) {
+	category.CategoryName = req.CategoryName
+	err := s.categoryRepo.Update(ctx, category)
+	if err != nil {
+		return nil, err
+	}
+
+	updateTask, err := s.categoryRepo.GetCategoryByID(ctx, category.ID)
+
+	return updateTask, err
 }
