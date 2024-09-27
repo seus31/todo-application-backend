@@ -38,3 +38,7 @@ func (r *CategoryRepository) GetCategoryByID(ctx context.Context, id uint) (*mod
 func (r *CategoryRepository) Update(ctx context.Context, category *models.Category) error {
 	return r.db.WithContext(ctx).Model(category).Updates(category).Error
 }
+
+func (r *CategoryRepository) Delete(ctx context.Context, category *models.Category) error {
+	return r.db.WithContext(ctx).Delete(&category, category.ID).Error
+}
