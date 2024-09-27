@@ -127,3 +127,22 @@ func (cc *CategoryController) UpdateCategory(ctx *fiber.Ctx) error {
 
 	return ctx.Status(fiber.StatusOK).JSON(response)
 }
+
+func (cc *CategoryController) DeleteCategory(ctx *fiber.Ctx) error {
+	categoryId, err := strconv.Atoi(ctx.Params("id"))
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid category ID"})
+	}
+
+	category, err := cc.CategoryService.GetCategory(utils.GetContextFromFiber(ctx), uint(categoryId))
+	if err != nil {
+		return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Category not found"})
+	}
+
+	if err := cc.CategoryService.DeleteCategory(utils.GetContextFromFiber(ctx), category); err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Cannot delete category"})
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"status": "OK"})
+
+}
