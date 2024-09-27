@@ -40,3 +40,7 @@ func (s *CategoryService) UpdateCategory(ctx context.Context, category *models.C
 
 	return updateTask, err
 }
+
+func (s *CategoryService) DeleteCategory(ctx context.Context, category *models.Category) error {
+	return s.categoryRepo.Delete(ctx, category)
+}
