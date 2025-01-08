@@ -2,11 +2,11 @@ package controllers
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/seus31/todo-application/backend/dto/requests/tasks"
-	"github.com/seus31/todo-application/backend/dto/responses"
-	"github.com/seus31/todo-application/backend/models"
-	"github.com/seus31/todo-application/backend/services"
-	"github.com/seus31/todo-application/backend/utils"
+	"github.com/seus31/todo-application-backend/dto/requests/tasks"
+	"github.com/seus31/todo-application-backend/dto/responses"
+	"github.com/seus31/todo-application-backend/models"
+	"github.com/seus31/todo-application-backend/services"
+	"github.com/seus31/todo-application-backend/utils"
 	"log"
 	"strconv"
 	"time"
@@ -28,7 +28,8 @@ func (tc *TaskController) GetTasks(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid parameters"})
 	}
 
-	if err := utils.ValidateStruct(&req); err != nil {
+	validate := tasks.GetTasksRequestValidator()
+	if err := utils.ValidateStruct(validate, &req); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
@@ -44,15 +45,22 @@ func (tc *TaskController) GetTasks(ctx *fiber.Ctx) error {
 func (tc *TaskController) CreateTask(ctx *fiber.Ctx) error {
 	var req tasks.CreateTaskRequest
 	if err := ctx.BodyParser(&req); err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Request parsing failed"})
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	if err := utils.ValidateStruct(&req); err != nil {
+	validate := tasks.CreateTaskRequestValidator()
+	if err := utils.ValidateStruct(validate, &req); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
 	task := &models.Task{
 		TaskName: req.TaskName,
+		UserID:   req.UserID,
+		ParentID: req.ParentID,
+		DueDate:  req.DueDate,
+		DueTime:  req.DueTime,
+		Status:   req.Status,
+		Priority: req.Priority,
 	}
 
 	if err := tc.TaskService.CreateTask(utils.GetContextFromFiber(ctx), task); err != nil {
@@ -69,11 +77,12 @@ func (tc *TaskController) GetTask(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid task ID"})
 	}
 
-	if err := utils.ValidateStruct(req); err != nil {
+	validate := tasks.GetTaskRequestValidator()
+	if err := utils.ValidateStruct(validate, req); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	task, err := tc.TaskService.GetTask(utils.GetContextFromFiber(ctx), req.ID)
+	task, err := tc.TaskService.GetTask(utils.GetContextFromFiber(ctx), uint(req.ID))
 	if err != nil {
 		return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Task not found"})
 	}
@@ -98,7 +107,8 @@ func (tc *TaskController) UpdateTask(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Cannot parse JSON"})
 	}
 
-	if err := utils.ValidateStruct(req); err != nil {
+	validate := tasks.UpdateTaskRequestValidator()
+	if err := utils.ValidateStruct(validate, req); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
