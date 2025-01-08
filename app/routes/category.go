@@ -2,9 +2,9 @@ package routes
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/seus31/todo-application/backend/controllers"
-	"github.com/seus31/todo-application/backend/repository"
-	"github.com/seus31/todo-application/backend/services"
+	"github.com/seus31/todo-application-backend/controllers"
+	"github.com/seus31/todo-application-backend/repository"
+	"github.com/seus31/todo-application-backend/services"
 	"gorm.io/gorm"
 )
 

@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/seus31/todo-application/backend/routes"
+	"github.com/seus31/todo-application-backend/routes"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

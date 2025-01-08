@@ -2,8 +2,8 @@ package services
 
 import (
 	"context"
-	"github.com/seus31/todo-application/backend/interfaces"
-	"github.com/seus31/todo-application/backend/models"
+	"github.com/seus31/todo-application-backend/interfaces"
+	"github.com/seus31/todo-application-backend/models"
 )
 
 type UserService struct {

@@ -1,4 +1,4 @@
-module github.com/seus31/todo-application/backend
+module github.com/seus31/todo-application-backend
 
 go 1.23
 
