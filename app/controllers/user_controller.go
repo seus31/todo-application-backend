@@ -2,11 +2,11 @@ package controllers
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/seus31/todo-application/backend/dto/requests/users"
-	"github.com/seus31/todo-application/backend/dto/responses"
-	"github.com/seus31/todo-application/backend/models"
-	"github.com/seus31/todo-application/backend/services"
-	"github.com/seus31/todo-application/backend/utils"
+	"github.com/seus31/todo-application-backend/dto/requests/users"
+	"github.com/seus31/todo-application-backend/dto/responses"
+	"github.com/seus31/todo-application-backend/models"
+	"github.com/seus31/todo-application-backend/services"
+	"github.com/seus31/todo-application-backend/utils"
 	"strconv"
 	"time"
 )
@@ -27,7 +27,8 @@ func (uc *UserController) CreateUser(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Request parsing failed"})
 	}
 
-	if err := utils.ValidateStruct(&req); err != nil {
+	validate := users.CreateUserRequestValidator()
+	if err := utils.ValidateStruct(validate, &req); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
@@ -55,7 +56,8 @@ func (uc *UserController) GetUsers(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid parameters"})
 	}
 
-	if err := utils.ValidateStruct(&req); err != nil {
+	validate := users.GetUsersRequestValidator()
+	if err := utils.ValidateStruct(validate, &req); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
@@ -74,7 +76,8 @@ func (uc *UserController) GetUser(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid parameters"})
 	}
 
-	if err := utils.ValidateStruct(&req); err != nil {
+	validate := users.GetUserRequestValidator()
+	if err := utils.ValidateStruct(validate, &req); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
@@ -104,7 +107,8 @@ func (uc *UserController) UpdateUser(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Cannot parse JSON"})
 	}
 
-	if err := utils.ValidateStruct(req); err != nil {
+	validate := users.UpdateUserRequestValidator()
+	if err := utils.ValidateStruct(validate, req); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
