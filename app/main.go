@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/seus31/todo-application-backend/middleware"
 	"github.com/seus31/todo-application-backend/routes"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -18,11 +19,15 @@ func main() {
 	}
 
 	api := app.Group("/api")
+	auth := api.Group("/auth")
 	v1 := api.Group("/v1")
-	tasks := v1.Group("/tasks")
+	v1.Use(middleware.AuthMiddleware)
+
 	users := v1.Group("/users")
+	tasks := v1.Group("/tasks")
 	categories := v1.Group("/categories")
 
+	routes.SetUpAuthRoutes(auth, db)
 	routes.SetUpTaskRoutes(tasks, db)
 	routes.SetUpUserRoutes(users, db)
 	routes.SetUpCategoryRoutes(categories, db)
