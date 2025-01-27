@@ -3,12 +3,12 @@ package middleware
 import "github.com/gofiber/fiber/v2"
 
 func AuthMiddleware(c *fiber.Ctx) error {
-	userID := c.Get("X-User-ID")
-	if userID == "" {
+	userToken := c.Get("X-User-Token")
+	if userToken == "" {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": "Unauthorized: User ID not provided",
+			"error": "Unauthorized: User Token not provided",
 		})
 	}
-	c.Locals("userID", userID)
+	c.Locals("userToken", userToken)
 	return c.Next()
 }
