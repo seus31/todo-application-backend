@@ -3,7 +3,7 @@ services:
     build: app
     volumes:
       - ./app:/app
-      - todo-application-backend-app-data:/app/tmp
+      - todo-application-backend-app-tmp:/app/tmp
     ports:
       - "${EXPOSE_PORT}:8080"
     environment:
@@ -24,7 +24,7 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
     volumes:
-      - todo-application-backend-app-postgres-data:/var/lib/postgresql/data
+      - todo-application-backend-postgres-data:/var/lib/postgresql/data
     networks:
       - todo-application-backend-network
     ports:
@@ -38,5 +38,5 @@ networks:
         - subnet: 172.33.1.0/24
 
 volumes:
-  todo-application-backend-app-data:
-  todo-application-backend-app-postgres-data:
+  todo-application-backend-app-tmp:
+  todo-application-backend-postgres-data:
