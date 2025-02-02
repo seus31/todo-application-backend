@@ -21,16 +21,11 @@ func NewAuthService(repo interfaces.UserRepositoryInterface) *AuthService {
 	}
 }
 
-func (s *AuthService) Register(ctx context.Context, name, email, password string) error {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		return err
-	}
-
+func (s *AuthService) Register(ctx context.Context, name, email, hashedPassword string) error {
 	user := &models.User{
 		Name:     name,
 		Email:    email,
-		Password: string(hashedPassword),
+		Password: hashedPassword,
 	}
 
 	return s.userRepo.Create(ctx, user)
@@ -58,4 +53,18 @@ func (s *AuthService) Login(ctx context.Context, username, password string) (str
 	}
 
 	return t, nil
+}
+
+func (s *AuthService) CheckUserByName(ctx context.Context, name string) bool {
+	if _, err := s.userRepo.FindUserByUsername(ctx, name); err == nil {
+		return false
+	}
+	return true
+}
+
+func (s *AuthService) CheckUserByEmail(ctx context.Context, email string) bool {
+	if _, err := s.userRepo.FindUserByEmail(ctx, email); err == nil {
+		return false
+	}
+	return true
 }
