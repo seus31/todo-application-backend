@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/seus31/todo-application-backend/dto/requests/users"
 	"github.com/seus31/todo-application-backend/services"
 	"github.com/seus31/todo-application-backend/utils"
 )
@@ -15,17 +16,30 @@ func NewAuthController(authService *services.AuthService) *AuthController {
 }
 
 func (c *AuthController) Register(ctx *fiber.Ctx) error {
-	var input struct {
-		Name     string `json:"name"`
-		Email    string `json:"email"`
-		Password string `json:"password"`
+	var req users.CreateUserRequest
+	if err := ctx.BodyParser(&req); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Request parsing failed"})
 	}
 
-	if err := ctx.BodyParser(&input); err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input"})
+	validate := users.CreateUserRequestValidator()
+	if err := utils.ValidateStruct(validate, &req); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	if err := c.authService.Register(utils.GetContextFromFiber(ctx), input.Name, input.Email, input.Password); err != nil {
+	if c.authService.CheckUserByName(utils.GetContextFromFiber(ctx), req.Name) == false {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Username already exists"})
+	}
+
+	if c.authService.CheckUserByEmail(utils.GetContextFromFiber(ctx), req.Email) == false {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Email already exists"})
+	}
+
+	hashPassword, err := utils.HashPassword(req.Password)
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	if err := c.authService.Register(utils.GetContextFromFiber(ctx), req.Name, req.Email, hashPassword); err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to register user"})
 	}
 
