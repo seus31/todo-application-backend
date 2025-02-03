@@ -4,10 +4,14 @@ import (
 	"context"
 	"errors"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gofiber/fiber/v2"
 	"github.com/seus31/todo-application-backend/config"
+	"github.com/seus31/todo-application-backend/dto/requests/users"
 	"github.com/seus31/todo-application-backend/interfaces"
 	"github.com/seus31/todo-application-backend/models"
+	"github.com/seus31/todo-application-backend/utils"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 	"time"
 )
 
@@ -21,18 +25,63 @@ func NewAuthService(repo interfaces.UserRepositoryInterface) *AuthService {
 	}
 }
 
-func (s *AuthService) Register(ctx context.Context, name, email, hashedPassword string) error {
-	user := &models.User{
-		Name:     name,
-		Email:    email,
-		Password: hashedPassword,
+func (s *AuthService) Register(ctx *fiber.Ctx) error {
+	var req users.CreateUserRequest
+	contextData := utils.GetContextFromFiber(ctx)
+
+	if err := ctx.BodyParser(&req); err != nil {
+		return ErrFailedToParseRequest
 	}
 
-	return s.userRepo.Create(ctx, user)
+	validate := users.CreateUserRequestValidator()
+	if err := utils.ValidateStruct(validate, &req); err != nil {
+		return err
+	}
+
+	_, err := s.userRepo.FindUserByName(contextData, req.Name)
+
+	if err == nil {
+		return ErrDuplicateName
+	}
+
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return ErrFailedToRegisterUser
+	}
+
+	_, err = s.userRepo.FindUserByEmail(contextData, req.Email)
+	if err == nil {
+		return ErrDuplicateEmail
+	}
+
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return ErrFailedToRegisterUser
+	}
+
+	if utils.CheckPasswordAndConfirmPassword(req.Password, req.ConfirmPassword) == false {
+		return ErrPasswordMismatch
+	}
+
+	hashPassword, err := utils.HashPassword(req.Password)
+	if err != nil {
+		return ErrFailedToHashPassword
+	}
+
+	user := &models.User{
+		Name:     req.Name,
+		Email:    req.Email,
+		Password: hashPassword,
+	}
+
+	err = s.userRepo.Create(contextData, user)
+	if err != nil {
+		return ErrFailedToRegisterUser
+	}
+
+	return nil
 }
 
 func (s *AuthService) Login(ctx context.Context, username, password string) (string, error) {
-	user, err := s.userRepo.FindUserByUsername(ctx, username)
+	user, err := s.userRepo.FindUserByName(ctx, username)
 	if err != nil {
 		return "", err
 	}
@@ -53,18 +102,4 @@ func (s *AuthService) Login(ctx context.Context, username, password string) (str
 	}
 
 	return t, nil
-}
-
-func (s *AuthService) CheckUserByName(ctx context.Context, name string) bool {
-	if _, err := s.userRepo.FindUserByUsername(ctx, name); err == nil {
-		return false
-	}
-	return true
-}
-
-func (s *AuthService) CheckUserByEmail(ctx context.Context, email string) bool {
-	if _, err := s.userRepo.FindUserByEmail(ctx, email); err == nil {
-		return false
-	}
-	return true
 }

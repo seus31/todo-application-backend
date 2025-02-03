@@ -1,8 +1,8 @@
 package controllers
 
 import (
+	"errors"
 	"github.com/gofiber/fiber/v2"
-	"github.com/seus31/todo-application-backend/dto/requests/users"
 	"github.com/seus31/todo-application-backend/services"
 	"github.com/seus31/todo-application-backend/utils"
 )
@@ -16,31 +16,20 @@ func NewAuthController(authService *services.AuthService) *AuthController {
 }
 
 func (c *AuthController) Register(ctx *fiber.Ctx) error {
-	var req users.CreateUserRequest
-	if err := ctx.BodyParser(&req); err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Request parsing failed"})
-	}
+	if err := c.authService.Register(ctx); err != nil {
+		if errors.Is(err, services.ErrDuplicateName) ||
+			errors.Is(err, services.ErrDuplicateEmail) ||
+			errors.Is(err, services.ErrPasswordMismatch) ||
+			errors.Is(err, services.ErrFailedToParseRequest) ||
+			errors.Is(err, services.ErrFailedToHashPassword) {
+			return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+		}
 
-	validate := users.CreateUserRequestValidator()
-	if err := utils.ValidateStruct(validate, &req); err != nil {
+		if errors.Is(err, services.ErrFailedToRegisterUser) {
+			return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+		}
+
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
-	}
-
-	if c.authService.CheckUserByName(utils.GetContextFromFiber(ctx), req.Name) == false {
-		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Username already exists"})
-	}
-
-	if c.authService.CheckUserByEmail(utils.GetContextFromFiber(ctx), req.Email) == false {
-		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Email already exists"})
-	}
-
-	hashPassword, err := utils.HashPassword(req.Password)
-	if err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
-	}
-
-	if err := c.authService.Register(utils.GetContextFromFiber(ctx), req.Name, req.Email, hashPassword); err != nil {
-		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to register user"})
 	}
 
 	return ctx.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "User registered successfully"})
