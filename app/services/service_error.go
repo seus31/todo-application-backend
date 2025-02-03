@@ -9,4 +9,6 @@ var (
 	ErrPasswordMismatch     = errors.New("password and confirm password do not match")
 	ErrFailedToRegisterUser = errors.New("failed to register user")
 	ErrFailedToHashPassword = errors.New("failed to hash password")
+	ErrUnexpectedError      = errors.New("unexpected error")
+	ErrInvalidCredentials   = errors.New("invalid credentials")
 )
