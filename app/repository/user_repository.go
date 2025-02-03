@@ -43,9 +43,9 @@ func (r *UserRepository) Delete(ctx context.Context, user *models.User) error {
 	return r.db.WithContext(ctx).Delete(&user, user.ID).Error
 }
 
-func (r *UserRepository) FindUserByUsername(ctx context.Context, username string) (*models.User, error) {
+func (r *UserRepository) FindUserByName(ctx context.Context, name string) (*models.User, error) {
 	var user models.User
-	if err := r.db.WithContext(ctx).Where("name = ?", username).First(&user).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("name = ?", name).First(&user).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil
