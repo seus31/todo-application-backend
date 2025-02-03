@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/gofiber/fiber/v2"
 	"github.com/seus31/todo-application-backend/services"
-	"github.com/seus31/todo-application-backend/utils"
 )
 
 type AuthController struct {
@@ -36,18 +35,14 @@ func (c *AuthController) Register(ctx *fiber.Ctx) error {
 }
 
 func (c *AuthController) Login(ctx *fiber.Ctx) error {
-	var input struct {
-		Name     string `json:"name"`
-		Password string `json:"password"`
-	}
-
-	if err := ctx.BodyParser(&input); err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input"})
-	}
-
-	token, err := c.authService.Login(utils.GetContextFromFiber(ctx), input.Name, input.Password)
+	token, err := c.authService.Login(ctx)
 	if err != nil {
-		return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid credentials"})
+		if errors.Is(err, services.ErrFailedToParseRequest) ||
+			errors.Is(err, services.ErrInvalidCredentials) {
+			return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+		}
+
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
 
 	return ctx.JSON(fiber.Map{"token": token})
