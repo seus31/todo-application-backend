@@ -25,3 +25,7 @@ func CheckPasswordHash(password string) bool {
 
 	return err == nil
 }
+
+func CheckPasswordAndConfirmPassword(password string, ConfirmPassword string) bool {
+	return password == ConfirmPassword
+}
