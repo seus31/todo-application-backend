@@ -1,11 +1,11 @@
 package services
 
 import (
-	"context"
 	"errors"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 	"github.com/seus31/todo-application-backend/config"
+	"github.com/seus31/todo-application-backend/dto/requests/auth"
 	"github.com/seus31/todo-application-backend/dto/requests/users"
 	"github.com/seus31/todo-application-backend/interfaces"
 	"github.com/seus31/todo-application-backend/models"
@@ -80,14 +80,24 @@ func (s *AuthService) Register(ctx *fiber.Ctx) error {
 	return nil
 }
 
-func (s *AuthService) Login(ctx context.Context, username, password string) (string, error) {
-	user, err := s.userRepo.FindUserByName(ctx, username)
-	if err != nil {
-		return "", err
+func (s *AuthService) Login(ctx *fiber.Ctx) (string, error) {
+	var req auth.LoginRequest
+	contextData := utils.GetContextFromFiber(ctx)
+
+	if err := ctx.BodyParser(&req); err != nil {
+		return "", ErrFailedToParseRequest
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
-		return "", errors.New("invalid password")
+	user, err := s.userRepo.FindUserByName(contextData, req.Name)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return "", ErrInvalidCredentials
+		}
+		return "", ErrUnexpectedError
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
+		return "", ErrInvalidCredentials
 	}
 
 	token := jwt.New(jwt.SigningMethodHS256)
@@ -98,7 +108,7 @@ func (s *AuthService) Login(ctx context.Context, username, password string) (str
 
 	t, err := token.SignedString([]byte(config.Config("SECRET_KEY")))
 	if err != nil {
-		return "", err
+		return "", ErrUnexpectedError
 	}
 
 	return t, nil
