@@ -7,7 +7,6 @@ import (
 
 type CreateTaskRequest struct {
 	TaskName string            `json:"task_name" validate:"required,max=255"`
-	UserID   uint              `json:"user_id" validate:"required,numeric"`
 	ParentID *uint             `json:"parent_id" validate:"omitempty,numeric"`
 	DueDate  *string           `json:"due_date" validate:"omitempty,datetime=2006-01-02"`
 	DueTime  *string           `json:"due_time" validate:"omitempty,datetime=15:04"`
