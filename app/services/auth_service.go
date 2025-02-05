@@ -103,6 +103,7 @@ func (s *AuthService) Login(ctx *fiber.Ctx) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := token.Claims.(jwt.MapClaims)
+	claims["id"] = user.ID
 	claims["name"] = user.Name
 	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 
