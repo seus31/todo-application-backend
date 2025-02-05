@@ -36,7 +36,7 @@ func (r *TaskRepository) GetTaskByID(ctx context.Context, id uint) (*models.Task
 }
 
 func (r *TaskRepository) Update(ctx context.Context, task *models.Task) error {
-	return r.db.WithContext(ctx).Model(task).Updates(task).Error
+	return r.db.WithContext(ctx).Model(task).Save(task).Error
 }
 
 func (r *TaskRepository) Delete(ctx context.Context, task *models.Task) error {
