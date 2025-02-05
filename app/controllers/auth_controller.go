@@ -16,19 +16,11 @@ func NewAuthController(authService *services.AuthService) *AuthController {
 
 func (c *AuthController) Register(ctx *fiber.Ctx) error {
 	if err := c.authService.Register(ctx); err != nil {
-		if errors.Is(err, services.ErrDuplicateName) ||
-			errors.Is(err, services.ErrDuplicateEmail) ||
-			errors.Is(err, services.ErrPasswordMismatch) ||
-			errors.Is(err, services.ErrFailedToParseRequest) ||
-			errors.Is(err, services.ErrFailedToHashPassword) {
-			return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
-		}
-
 		if errors.Is(err, services.ErrFailedToRegisterUser) {
 			return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+		} else {
+			return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 		}
-
-		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
 	return ctx.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "User registered successfully"})
