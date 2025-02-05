@@ -37,6 +37,61 @@ type Task struct {
 	UpdatedAt time.Time  `json:"updated_at" validate:"-"`
 }
 
+type TaskOption func(*Task)
+
+func WithParentID(parentID *uint) TaskOption {
+	return func(t *Task) {
+		if parentID != nil {
+			t.ParentID = parentID
+		}
+	}
+}
+
+func WithDueDate(dueDate string) TaskOption {
+	return func(t *Task) {
+		if dueDate != "" {
+			t.DueDate = &dueDate
+		}
+	}
+}
+
+func WithDueTime(dueTime string) TaskOption {
+	return func(t *Task) {
+		if dueTime != "" {
+			t.DueTime = &dueTime
+		}
+	}
+}
+
+func WithStatus(status TaskStatus) TaskOption {
+	return func(t *Task) {
+		if status != "" {
+			t.Status = status
+		}
+	}
+}
+
+func WithPriority(priority Priority) TaskOption {
+	return func(t *Task) {
+		if priority != 0 {
+			t.Priority = priority
+		}
+	}
+}
+
+func NewTask(taskName string, userID uint, options ...TaskOption) *Task {
+	task := &Task{
+		TaskName: taskName,
+		UserID:   userID,
+	}
+
+	for _, opt := range options {
+		opt(task)
+	}
+
+	return task
+}
+
 var validate *validator.Validate
 
 func init() {
