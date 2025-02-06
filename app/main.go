@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/seus31/todo-application-backend/database/seeders"
 	"github.com/seus31/todo-application-backend/middleware"
 	"github.com/seus31/todo-application-backend/routes"
@@ -12,6 +13,8 @@ import (
 
 func main() {
 	app := fiber.New()
+
+	app.Use(cors.New())
 
 	dsn := "host=db user=myuser password=mypassword dbname=mydb port=5432 sslmode=disable TimeZone=Asia/Tokyo"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
