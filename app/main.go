@@ -2,8 +2,10 @@ package main
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/seus31/todo-application-backend/database/seeders"
 	"github.com/seus31/todo-application-backend/middleware"
 	"github.com/seus31/todo-application-backend/routes"
+	admin_routes "github.com/seus31/todo-application-backend/routes/admin"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -18,7 +20,13 @@ func main() {
 		panic("データベース接続に失敗しました")
 	}
 
+	err = seeders.AdminSeed(db)
+	if err != nil {
+		panic("シーダーの実行に失敗しました")
+	}
+
 	api := app.Group("/api")
+	adminAuth := api.Group("/admin/auth")
 	auth := api.Group("/auth")
 	v1 := api.Group("/v1")
 	v1.Use(middleware.AuthMiddleware)
@@ -27,6 +35,10 @@ func main() {
 	tasks := v1.Group("/tasks")
 	categories := v1.Group("/categories")
 
+	// Admin Routes
+	admin_routes.SetUpAuthRoutes(adminAuth, db)
+
+	// User Routes
 	routes.SetUpAuthRoutes(auth, db)
 	routes.SetUpTaskRoutes(tasks, db)
 	routes.SetUpUserRoutes(users, db)
