@@ -64,8 +64,8 @@ func (s *TaskService) CreateTask(ctx *fiber.Ctx) (*models.Task, error) {
 		req.TaskName,
 		ctx.Locals("userID").(uint),
 		models.WithParentID(req.ParentID),
-		models.WithDueDate(*req.DueDate),
-		models.WithDueTime(*req.DueTime),
+		models.WithDueDate(req.DueDate),
+		models.WithDueTime(req.DueTime),
 		models.WithStatus(req.Status),
 		models.WithPriority(req.Priority),
 	)

@@ -47,18 +47,18 @@ func WithParentID(parentID *uint) TaskOption {
 	}
 }
 
-func WithDueDate(dueDate string) TaskOption {
+func WithDueDate(dueDate *string) TaskOption {
 	return func(t *Task) {
-		if dueDate != "" {
-			t.DueDate = &dueDate
+		if dueDate != nil {
+			t.DueDate = dueDate
 		}
 	}
 }
 
-func WithDueTime(dueTime string) TaskOption {
+func WithDueTime(dueTime *string) TaskOption {
 	return func(t *Task) {
-		if dueTime != "" {
-			t.DueTime = &dueTime
+		if dueTime != nil {
+			t.DueTime = dueTime
 		}
 	}
 }
