@@ -27,7 +27,7 @@ func (c *AuthController) Register(ctx *fiber.Ctx) error {
 }
 
 func (c *AuthController) Login(ctx *fiber.Ctx) error {
-	token, err := c.authService.Login(ctx)
+	token, userId, err := c.authService.Login(ctx)
 	if err != nil {
 		if errors.Is(err, services.ErrFailedToParseRequest) ||
 			errors.Is(err, services.ErrInvalidCredentials) {
@@ -37,5 +37,5 @@ func (c *AuthController) Login(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	return ctx.JSON(fiber.Map{"token": token})
+	return ctx.JSON(fiber.Map{"token": token, "userId": userId})
 }

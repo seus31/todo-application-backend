@@ -80,24 +80,24 @@ func (s *AuthService) Register(ctx *fiber.Ctx) error {
 	return nil
 }
 
-func (s *AuthService) Login(ctx *fiber.Ctx) (string, error) {
+func (s *AuthService) Login(ctx *fiber.Ctx) (string, *uint, error) {
 	var req auth.LoginRequest
 	contextData := utils.GetContextFromFiber(ctx)
 
 	if err := ctx.BodyParser(&req); err != nil {
-		return "", ErrFailedToParseRequest
+		return "", nil, ErrFailedToParseRequest
 	}
 
 	user, err := s.userRepo.FindUserByName(contextData, req.Name)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return "", ErrInvalidCredentials
+			return "", nil, ErrInvalidCredentials
 		}
-		return "", ErrUnexpectedError
+		return "", nil, ErrUnexpectedError
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
-		return "", ErrInvalidCredentials
+		return "", nil, ErrInvalidCredentials
 	}
 
 	token := jwt.New(jwt.SigningMethodHS256)
@@ -109,8 +109,8 @@ func (s *AuthService) Login(ctx *fiber.Ctx) (string, error) {
 
 	t, err := token.SignedString([]byte(config.Config("SECRET_KEY")))
 	if err != nil {
-		return "", ErrUnexpectedError
+		return "", nil, ErrUnexpectedError
 	}
 
-	return t, nil
+	return t, &user.ID, nil
 }
