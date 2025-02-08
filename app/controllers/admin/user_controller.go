@@ -1,21 +1,21 @@
-package controllers
+package admin_controllers
 
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/seus31/todo-application-backend/dto/requests/users"
 	"github.com/seus31/todo-application-backend/dto/responses"
 	"github.com/seus31/todo-application-backend/models"
-	"github.com/seus31/todo-application-backend/services"
+	"github.com/seus31/todo-application-backend/services/admin"
 	"github.com/seus31/todo-application-backend/utils"
 	"strconv"
 	"time"
 )
 
 type UserController struct {
-	UserService *services.UserService
+	UserService *admin_services.UserService
 }
 
-func NewUserController(userService *services.UserService) *UserController {
+func NewUserController(userService *admin_services.UserService) *UserController {
 	return &UserController{
 		UserService: userService,
 	}
