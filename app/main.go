@@ -34,17 +34,22 @@ func main() {
 	v1 := api.Group("/v1")
 	v1.Use(middleware.AuthMiddleware)
 
-	users := v1.Group("/users")
+	admin := v1.Group("/admin")
+	users := admin.Group("/users")
+
+	user := v1.Group("/user")
 	tasks := v1.Group("/tasks")
 	categories := v1.Group("/categories")
 
 	// Admin Routes
 	admin_routes.SetUpAuthRoutes(adminAuth, db)
+	admin_routes.SetUpUserRoutes(users, db)
 
 	// User Routes
 	routes.SetUpAuthRoutes(auth, db)
+	routes.SetUpUserInfoRoutes(user, db)
 	routes.SetUpTaskRoutes(tasks, db)
-	routes.SetUpUserRoutes(users, db)
+	admin_routes.SetUpUserRoutes(users, db)
 	routes.SetUpCategoryRoutes(categories, db)
 
 	err = app.Listen(":8080")
