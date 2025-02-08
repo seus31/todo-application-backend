@@ -28,7 +28,7 @@ func (s *TaskService) GetTasks(ctx *fiber.Ctx) ([]*models.Task, error) {
 	var req tasks.GetTasksRequest
 	contextData := utils.GetContextFromFiber(ctx)
 
-	if err := ctx.BodyParser(&req); err != nil {
+	if err := ctx.QueryParser(&req); err != nil {
 		return nil, ErrFailedToParseRequest
 	}
 
@@ -38,7 +38,7 @@ func (s *TaskService) GetTasks(ctx *fiber.Ctx) ([]*models.Task, error) {
 	}
 
 	offset := (req.Page - 1) * req.Limit
-	tasksData, err := s.taskRepo.GetTasks(contextData, req.Limit, offset)
+	tasksData, err := s.taskRepo.GetTasks(contextData, ctx.Locals("userID").(uint), req.Limit, offset)
 
 	if err != nil {
 		return nil, ErrUnexpectedError

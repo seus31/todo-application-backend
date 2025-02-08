@@ -15,9 +15,9 @@ func NewTaskRepository(db *gorm.DB) interfaces.TaskRepositoryInterface {
 	return &TaskRepository{db: db}
 }
 
-func (r *TaskRepository) GetTasks(ctx context.Context, limit int, offset int) ([]*models.Task, error) {
+func (r *TaskRepository) GetTasks(ctx context.Context, userId uint, limit int, offset int) ([]*models.Task, error) {
 	var tasks []*models.Task
-	if err := r.db.WithContext(ctx).Limit(limit).Offset(offset).Find(&tasks).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("user_id = ?", userId).Limit(limit).Offset(offset).Find(&tasks).Error; err != nil {
 		return nil, err
 	}
 	return tasks, nil
