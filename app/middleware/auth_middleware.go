@@ -5,6 +5,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 	"github.com/seus31/todo-application-backend/config"
+	"time"
 )
 
 func AuthMiddleware(c *fiber.Ctx) error {
@@ -35,6 +36,13 @@ func AuthMiddleware(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"error": "Unauthorized: Invalid Token Claims",
+		})
+	}
+
+	exp := int64(claims["exp"].(float64))
+	if time.Now().Unix() > exp {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Token expired",
 		})
 	}
 
